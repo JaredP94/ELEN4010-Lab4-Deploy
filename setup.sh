@@ -28,7 +28,7 @@ configureNginx () {
 
      sudo bash -c 'cat > /etc/nginx/sites-available/default <<EOF
     server {
-        server_name freethenode.tk;
+        server_name _;
         location / {
             proxy_pass http://127.0.0.1:3000;
             proxy_http_version 1.1;
