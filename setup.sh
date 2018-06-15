@@ -1,100 +1,131 @@
-#!/usr/bin/env bash
+#! /bin/bash
 
-
-setupEnvrionment () {
-    printf '===========================Setup the environment============================== \n'
-
-    cd ..
+function initialize_worker() {
+    printf "***************************************************\n\t\tSetting up host \n***************************************************\n"
+    # Update packages
+    echo ======= Updating packages ========
     sudo apt-get update
-    sudo apt-get install software-properties-common
-    sudo add-apt-repository -y ppa:certbot/certbot
-    sudo apt-get update
+
+    # Export language locale settings
+    echo ======= Exporting language locale settings =======
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+
+    # Install app dependencies
+    echo ======= Installing dependencies =======
+    sudo apt-get install -y python3-pip
     sudo apt-get install -y npm
     curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
     sudo apt-get install -y nodejs nginx python-certbot-nginx build-essential
     sudo rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 }
 
-setupApp () {
-    printf '===========================Setup the Application ============================== \n'
-    git clone https://github.com/JaredP94/ELEN4010-Lab4.git
-    cd ELEN4010-Lab4
-    npm install
+function clone_app_repository() {
+    printf "***************************************************\n\t\tFetching App \n***************************************************\n"
+    # Clone and access project directory
+    echo ======== Cloning and accessing project directory ========
+    if [[ -d ~/app ]]; then
+        sudo rm -rf ~/app
+        git clone -b master https://github.com/JaredP94/ELEN4010-Lab4.git ~/app
+        cd ~/app
+        npm install
+    else
+        git clone -b master https://github.com/JaredP94/ELEN4010-Lab4.git ~/app
+        cd ~/app
+        npm install
+    fi
 }
 
+# Install and configure nginx
+function setup_nginx() {
+    printf "***************************************************\n\t\tSetting up nginx \n***************************************************\n"
+    echo ======= Installing nginx =======
+    sudo apt-get install -y nginx
 
-configureNginx () {
-    printf '================================= Configure nginx ============================== \n'
-
-     sudo bash -c 'cat > /etc/nginx/sites-available/default <<EOF
+    # Configure nginx routing
+    echo ======= Configuring nginx =======
+    echo ======= Removing default config =======
+    sudo rm -rf /etc/nginx/sites-available/default
+    sudo rm -rf /etc/nginx/sites-enabled/default
+    echo ======= Replace config file =======
+    sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/default
     server {
-        server_name freethenode.ml www.freethenode.ml;
-        location / {
-            proxy_pass http://127.0.0.1:3000;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade \$http_upgrade;
-            proxy_set_header Connection 'upgrade';
-            proxy_set_header Host \$host;
-            proxy_cache_bypass \$http_upgrade;
-            proxy_redirect off;
-        }
+            listen 80 default_server;
+            listen [::]:80 default_server;
+
+            server_name _;
+
+            location / {
+                    # reverse proxy and serve the app
+                    # running on the localhost
+                    proxy_pass http://127.0.0.1:3000/;
+                    proxy_set_header HOST \$host;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            }
     }
-    '
+EOF'
 
+    echo ======= Create a symbolic link of the file to sites-enabled =======
     sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+    # Ensure nginx server is running
+    echo ====== Checking nginx server status ========
     sudo systemctl restart nginx
+    sudo nginx -t
 }
 
-configureCertbot () {
-    printf '================================= Configure Certabot ============================== \n'
+# Add a launch script
+function create_launch_script () {
+    printf "***************************************************\n\t\tCreating a Launch script \n***************************************************\n"
 
-    sudo certbot --nginx
-}
-
-setupStartScript () {
-    printf '=========================== Create a startup script =========================== \n'
-
-     sudo bash -c 'cat > /home/jp140694/startapp.sh <<EOF
+    sudo cat > /home/jp140694/launch.sh <<EOF
     #!/bin/bash
-
-    cd /home/jp140694/ELEN4010-Lab4
+    cd /home/jp140694/app
     npm start
-    '
+EOF
+    sudo chmod 744 /home/jp140694/launch.sh
+    echo ====== Ensuring script is executable =======
+    ls -la ~/launch.sh
 }
 
-setupStartService () {
-    printf '=========================== Configure startup service =========================== \n'
+function configure_startup_service () {
+    printf "***************************************************\n\t\tConfiguring startup service \n***************************************************\n"
 
-     sudo bash -c 'cat > /etc/systemd/system/ELEN4010-Lab4.service <<EOF
+    sudo bash -c 'cat > /etc/systemd/system/app.service <<EOF
     [Unit]
-    Description=reacipe startup service
+    Description=app startup service
     After=network.target
 
     [Service]
     User=jp140694
-    ExecStart=/bin/bash /home/jp140694/startapp.sh
-    Restart=always
+    ExecStart=/bin/bash /home/jp140694/launch.sh
 
     [Install]
     WantedBy=multi-user.target
-    '
+EOF'
 
-    sudo chmod 744 /home/jp140694/startapp.sh
-    sudo chmod 664 /etc/systemd/system/ELEN4010-Lab4.service
+    sudo chmod 664 /etc/systemd/system/app.service
     sudo systemctl daemon-reload
-    sudo systemctl enable ELEN4010-Lab4.service
-    sudo systemctl start ELEN4010-Lab4.service
-
+    sudo systemctl enable app.service
+    sudo systemctl start app.service
+    sudo service app status
 }
 
-
-run () {
-    setupEnvrionment
-    setupApp
-    configureNginx
-    configureCertbot
-    setupStartScript
-    setupStartService
+Serve the web app through gunicorn
+function launch_app() {
+    printf "***************************************************\n\t\tServing the App \n***************************************************\n"
+    sudo bash /home/jp140694/launch.sh
 }
 
-run
+######################################################################
+########################      RUNTIME       ##########################
+######################################################################
+
+initialize_worker
+clone_app_repository
+setup_nginx
+create_launch_script
+configure_startup_service
+launch_app
