@@ -54,7 +54,7 @@ configureCertbot () {
 setupStartScript () {
     printf '=========================== Create a startup script =========================== \n'
 
-     sudo bash -c 'cat > /home/ubuntu/startapp.sh <<EOF
+     sudo bash -c 'cat > /home/jp140694/startapp.sh <<EOF
     #!/bin/bash
 
     cd /home/jp140694/ELEN4010-Lab4
