@@ -22,8 +22,6 @@ function install_certbot() {
 
 function install_certificate() {
     printf "***************************************************\n\tInstalling SSL Certificate \n***************************************************\n"
-    echo "====== Ensuring that nginx is running ======="
-    sudo service nginx status
     echo "======= Installing SSL for nginx ======="
     sudo certbot --nginx
 }
