@@ -26,29 +26,20 @@ setupApp () {
 configureNginx () {
     printf '================================= Configure nginx ============================== \n'
 
-    echo ======= Configuring nginx =======
-    echo ======= Removing default config =======
-    sudo rm -rf /etc/nginx/sites-available/default
-    sudo rm -rf /etc/nginx/sites-enabled/default
-    echo ======= Replace config file =======
-    sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/default
+     sudo bash -c 'cat > /etc/nginx/sites-available/default <<EOF
     server {
-            listen 80 default_server;
-            listen [::]:80 default_server;
-
-            server_name _;
-
-            location / {
-                    # reverse proxy and serve the app
-                    # running on the localhost:3000
-                    proxy_pass http://127.0.0.1:3000/;
-                    proxy_set_header HOST \$host;
-                    proxy_set_header X-Forwarded-Proto \$scheme;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            }
+        server_name freethenode.ml www.freethenode.ml;
+        location / {
+            proxy_pass http://127.0.0.1:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade \$http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host \$host;
+            proxy_cache_bypass \$http_upgrade;
+            proxy_redirect off;
+        }
     }
-EOF'
+    '
 
     sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
     sudo systemctl restart nginx
