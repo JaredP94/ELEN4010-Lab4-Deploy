@@ -19,3 +19,10 @@ Site can be accessed at [freethenode.ml](http://freethenode.ml/todo)
 ### Part 2: Connecting to your VM Instance
 Once the instance has been created and launched, GCP offers a range of [convenient SSH connectivity options](https://cloud.google.com/compute/docs/instances/connecting-advanced)
 * Select the *SSH* button under the *Connect* header of the Instance which will launch a new browser window with a terminal to interact with your new Instance
+
+### Part 3: Managing terminal sessions
+A future consideration that will be made early is the idea of a terminal running a process, even after it has been closed. `tmux`, a terminal multiplexer, has been chosen to perform this task ([useful tmux cheat sheet](https://tmuxcheatsheet.com/)).
+* 2 Sessions will be required - One to run the app service + One to manage the SSL configuration once the app service is running (this one will be temporary as the session can be terminated once completed)
+* Run `sudo apt-get install tmux` to install the multiplexer
+* Run `tmux` to verify a new session is created
+* Run `ctrl + d` to terminate the session
