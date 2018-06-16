@@ -13,7 +13,7 @@ Site can be accessed at [freethenode.ml](https://freethenode.ml/todo)
 * Select a region of your choice (region latency to your location can be tested with the [gcping tool](http://www.gcping.com/))
 * Change your machine type to the *micro* option (1 shared vCPU + 0.6GB RAM)
 * Change the boot disk image to *Ubuntu 18.04 LTS*
-* Tick the firewall exceptions for allowing *HTTP* and *HTTPS* traffic (this will allow incoming traffic on Port 80 - should you wish to create custom firewall exceptions, [consult this useful article](https://cloud.google.com/vpc/docs/firewalls))
+* Tick the firewall exceptions for allowing *HTTP* and *HTTPS* traffic (this will allow incoming traffic on Port 80 - should you wish to create custom firewall exceptions, [consult this useful article](https://cloud.google.com/vpc/docs/firewalls) - traffic on this port will be redirected using *NGINX* which is used as a reverse proxy, a conevnient load balancer, and an SSL manager)
 * Finally, select *Create*
 
 ### Part 2: Connecting to your VM Instance
@@ -42,7 +42,7 @@ Accessing an app service through an IP address is probably something a user woul
 * Once you've selected a domain name, ensure that you forward the doman name to your server's public IP address
 
 ### Part 6: Configuring SSL for App Service
-Security is a pivotal requirement for data integrity of any app service (among other reasons) - so let's utilise SSL, an industry standard choice, to secure traffic on the app service
+Security is a pivotal requirement for data integrity of any app service (among other reasons) - so let's utilise SSL, an industry standard choice, to secure traffic on the app service. This is done through the use of *CertBot* which is provided by EFF (more on that [here](https://certbot.eff.org/docs/intro.html) if you're interested).
 * Connect to the server with a new *SSH* terminal
 * Run `cd ELEN4010-Lab4-Deploy` to move into the deployment folder
 * Run `source ssl-config.sh` to launch and configure the *SSL* configuration of the app service
