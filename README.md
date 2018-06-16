@@ -1,7 +1,7 @@
 # ELEN4010-Lab4-Deploy
 ### Walkthrough with Bash scripts for convenient setup and running of a secure nodejs application on GCP
 
-Site can be accessed at [freethenode.ml](http://freethenode.ml/todo)
+Site can be accessed at [freethenode.ml](https://freethenode.ml/todo)
 
 ## Setup Process
 
@@ -20,9 +20,17 @@ Site can be accessed at [freethenode.ml](http://freethenode.ml/todo)
 Once the instance has been created and launched, GCP offers a range of [convenient SSH connectivity options](https://cloud.google.com/compute/docs/instances/connecting-advanced)
 * Select the *SSH* button under the *Connect* header of the Instance which will launch a new browser window with a terminal to interact with your new Instance
 
-### Part 3: Managing terminal sessions
+### Part 3: Managing Terminal Sessions
 A future consideration that will be made early is the idea of a terminal running a process, even after it has been closed. `tmux`, a terminal multiplexer, has been chosen to perform this task ([useful tmux cheat sheet](https://tmuxcheatsheet.com/)).
 * 2 Sessions will be required - One to run the app service + One to manage the SSL configuration once the app service is running (this one will be temporary as the session can be terminated once completed)
 * Run `sudo apt-get install tmux` to install the multiplexer
 * Run `tmux` to verify a new session is created
 * Run `ctrl + d` to terminate the session
+
+### Part 4: Configure and Run Nodejs App Service
+* Run `git clone https://github.com/JaredP94/ELEN4010-Lab4-Deploy.git` to copy the deployment files to the instance
+* Run `tmux` to begin a new session
+* Run `cd ELEN4010-Lab4-Deploy` to move into the deployment folder
+* Run `source setup.sh` to configure and launch the app service
+* Once complete and the app service is running, you can close that terminal window (don't worry, it'll still be running)
+* Access the app by navigating to `http://<YOUR INSTANCE PUBLIC IP>/todo`
