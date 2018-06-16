@@ -33,9 +33,23 @@ A future consideration that will be made early is the idea of a terminal running
 * Run `cd ELEN4010-Lab4-Deploy` to move into the deployment folder
 * Run `source setup.sh` to configure and launch the app service
 * Once complete and the app service is running, you can close that terminal window (don't worry, it'll still be running)
-* Access the app by navigating to `http://<YOUR INSTANCE PUBLIC IP>/todo`
+* Access the app service by navigating to `http://<YOUR INSTANCE PUBLIC IP>/todo`
+* You'll notice the page is flagged as unsecure - we'll deal with this later :)
 
 ### Part 5: Obtaining Domain Name for App Service
 Accessing an app service through an IP address is probably something a user wouldn't come back to - so let's get a domain name for the app service.
 * Navaigate to [dot.tk](www.dot.tk) to obtain a free domain name
 * Once you've selected a domain name, ensure that you forward the doman name to your server's public IP address
+
+### Part 6: Configuring SSL for App Service
+Security is a pivotal requirement for data integrity of any app service (among other reasons) - so let's utilise SSL, an industry standard choice, to secure traffic on the app service
+* Connect to the server with a new *SSH* terminal
+* Run `cd ELEN4010-Lab4-Deploy` to move into the deployment folder
+* Run `source ssl-config.sh` to launch and configure the *SSL* configuration of the app service
+* You'll be prompted for your email address and whether you want to be added to a mailing list
+* You'll then be prompted to enter the domain name you wish to use which will be tested, verified, and certified
+* Close the terminal once the process is complete
+* Access the app service by navigating to `https://<YOUR DOMAIN NAME>/todo`
+* You'll notice the page is now flagged as secure
+
+### Congrats - You've sucessfully configured, deployed, and secured an accessible Nodejs App Service
