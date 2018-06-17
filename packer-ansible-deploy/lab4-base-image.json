@@ -7,7 +7,7 @@
             "type": "googlecompute",
             "project_id": "{{user 'project_id'}}",
             "zone": "europe-west1-b",
-            "machine_type": "f1-micro",
+            "machine_type": "n1-standard-1",
             "source_image_family": "ubuntu-1804-lts",
             "image_name": "lab4-base-{{isotime '20060102-150405'}}",
             "image_family": "lab4-base",
