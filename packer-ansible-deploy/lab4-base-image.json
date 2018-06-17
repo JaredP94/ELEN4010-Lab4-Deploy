@@ -1,0 +1,24 @@
+{
+    "variables": {
+            "project_id": "{{env `PROJECT_ID`}}"
+    },
+    "builders": [
+        {
+            "type": "googlecompute",
+            "project_id": "{{user 'project_id'}}",
+            "zone": "europe-west1-b",
+            "machine_type": "f1-micro",
+            "source_image_family": "ubuntu-1804-lts",
+            "image_name": "lab4-base-{{isotime '20060102-150405'}}",
+            "image_family": "lab4-base",
+            "image_description": "Ubuntu 18.04 with Python, Nodejs and NPM preinstalled",
+            "ssh_username": "raddit-user"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "ansible",
+            "playbook_file": "ansible-configuration.yml"
+        }
+    ]
+}
