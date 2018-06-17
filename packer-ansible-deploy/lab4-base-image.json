@@ -12,7 +12,7 @@
             "image_name": "lab4-base-{{isotime '20060102-150405'}}",
             "image_family": "lab4-base",
             "image_description": "Ubuntu 18.04 with Python, Nodejs and NPM preinstalled",
-            "ssh_username": "raddit-user"
+            "ssh_username": "jp140694"
         }
     ],
     "provisioners": [
