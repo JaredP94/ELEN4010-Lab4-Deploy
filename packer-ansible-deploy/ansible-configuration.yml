@@ -1,0 +1,111 @@
+hosts: all
+  become: yes
+  become_user: root
+
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+  tasks:
+    - name: Update packages (apt-get update)
+      apt:
+        update_cache: yes
+
+    - name: Add node
+      shell: curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+
+    - name: Installing nodejs nginx python-certbot-nginx build-essential
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nodejs
+        - nginx
+        - build-essential
+
+    - name: Starting nginx on boot
+      service:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Create Project directory
+      file:
+        path: /var/project
+        state: directory
+
+    - name: Clone the application repo
+      git:
+        repo: https://github.com/JaredP94/ELEN4010-Lab4.git
+        dest: /var/project/app
+
+    - name: Install project dependencies
+      shell:
+        chdir: /var/project/app/
+        cmd:
+          sudo npm install
+
+    - name: Removing nginx default.conf
+      command: rm -f /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+    - name: Adding nginx configuration
+      shell:
+        chdir: /etc/nginx/sites-available/
+        creates: default
+        cmd: |
+          sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/default
+          server {
+            listen 80 default_server;
+            listen [::]:80 default_server;
+
+            server_name freethenode.ml;
+
+            location / {
+                    # reverse proxy and serve the app
+                    # running on the localhost
+                    proxy_pass http://127.0.0.1:3000/;
+                    proxy_set_header HOST \$host;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            }
+          }
+          EOF'
+          ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+    - name: Restart nginx
+      command: systemctl restart nginx
+
+    - name: Create start script
+      shell:
+        chdir: /var/project/app/
+        creates: launch.sh
+        cmd: |
+          cat > launch.sh <<EOF
+          #!/bin/bash
+          cd /var/project/app/
+          npm start
+          EOF
+
+    - name: Create start service
+      shell:
+        chdir: /etc/systemd/system/
+        creates: reacipe.service
+        cmd: |
+          cat > app.service <<EOF
+          [Unit]
+          Description=app startup service
+          After=network.target
+          [Service]
+          User=jp140694
+          ExecStart=/bin/bash /var/project/app/launch.sh
+          Restart=always
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+    - name: Change permissions and start service
+      shell: |
+        sudo chmod 744 /var/project/app/launch.sh
+        sudo chmod 664 /etc/systemd/system/app.service
+        sudo systemctl daemon-reload
+        sudo systemctl enable app.service
+        sudo systemctl start app.service
