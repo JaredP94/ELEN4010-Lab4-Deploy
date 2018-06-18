@@ -88,7 +88,7 @@ hosts: all
     - name: Create start service
       shell:
         chdir: /etc/systemd/system/
-        creates: reacipe.service
+        creates: app.service
         cmd: |
           cat > app.service <<EOF
           [Unit]
