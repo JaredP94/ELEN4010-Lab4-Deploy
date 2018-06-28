@@ -41,7 +41,7 @@ A future consideration that will be made early is the idea of a terminal running
 ### Part 3: Obtaining Domain Name for App Service
 Accessing an app service through an IP address is probably something a user wouldn't come back to - so let's get a domain name for the app service.
 * Navaigate to [dot.tk](www.dot.tk) to obtain a free domain name
-* Once you've selected a domain name, ensure that you forward the doman name to your server's public IP address
+* Once you've selected a domain name, ensure that you forward the domain name to your server's public IP address
 * You can verify the domain name is correctly forwarded by performing a *DNS Lookup* using [MXtoolbox](https://mxtoolbox.com/SuperTool.aspx)
 
 ### Part 4: Configuring SSL for App Service
