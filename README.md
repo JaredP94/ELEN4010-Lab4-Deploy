@@ -39,6 +39,7 @@ Accessing an app service through an IP address is probably something a user woul
 * Run `tmux` to begin a new session
 * Run `cd ELEN4010-Lab4-Deploy` to move into the deployment folder
 * Run `source setup.sh` to configure and launch the app service as well as install an SSL certificate
+
 Security is a pivotal requirement for data integrity of any app service (among other reasons) - so let's utilise SSL, an industry standard choice, to secure traffic on the app service. This is done through the use of *CertBot* which is provided by EFF (more on that [here](https://certbot.eff.org/docs/intro.html) if you're interested).
 * You'll be prompted for your email address and whether you want to be added to a mailing list
 * You'll then be prompted to enter the domain name you wish to use which will be tested, verified, and certified
