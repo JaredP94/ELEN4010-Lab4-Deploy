@@ -76,6 +76,30 @@ EOF'
     sudo nginx -t
 }
 
+# Setup host
+function setup_host() {
+    printf "***************************************************\n\t\t Setting up host \n***************************************************\n"
+    echo ======= Updating packages ========
+    sudo apt-get update
+    echo ======= Installing software properties common ========
+    sudo apt-get install software-properties-common
+    echo ======= Adding certbot Personal Package Archives ========
+    sudo add-apt-repository ppa:certbot/certbot
+    echo ======= Updating packages =======
+    sudo apt-get update
+}
+
+function install_certbot() {
+    printf "***************************************************\n\t\t Installing Certbot \n***************************************************\n"
+    sudo apt-get install -y python-certbot-nginx 
+}
+
+function install_certificate() {
+    printf "***************************************************\n\tInstalling SSL Certificate \n***************************************************\n"
+    echo "======= Installing SSL for nginx ======="
+    sudo certbot --nginx
+}
+
 # Add a launch script
 function create_launch_script () {
     printf "***************************************************\n\t\tCreating a Launch script \n***************************************************\n"
@@ -126,6 +150,9 @@ function launch_app() {
 initialize_worker
 clone_app_repository
 setup_nginx
+setup_host
+install_certbot
+install_certificate
 create_launch_script
 configure_startup_service
 launch_app
